@@ -1,0 +1,53 @@
+# Creating a VPC
+
+aws ec2 create-vpc --cidr-block 10.0.0.0/16 --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=MyVPC},{Key=E$
+
+#Create subnets CIDR Blocks   
+
+10.0.0.0/24
+10.0.1.0/24
+10.0.2.0/24
+10.0.3.0/24
+aws ec2 create-subnet --vpc-id vpc-id --cidr-block 10.0.0.0/24 --availability-zone us-west-2a
+
+aws ec2 create-subnet --vpc-id vpc-id --cidr-block 10.0.2.0/24 --availability-zone us-west-2a
+
+aws ec2 create-subnet --vpc-id vpc-id --cidr-block 10.0.1.0/24 --availability-zone us-west-2b
+
+aws ec2 create-subnet --vpc-id vpc-id --cidr-block 10.0.3.0/24 --availability-zone us-west-2b
+
+#Create IGW (Internet Gateway)
+
+aws ec2 create-internet-gateway --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=fluffyway}]'
+
+#Attach IGW to VPC
+
+aws ec2 attach-internet-gateway --internet-gateway-id igw-id --vpc-id vpc-id
+
+#Create Route Tables
+
+aws ec2 create-route-table --vpc-id vpc-id
+
+Add a default route (0.0.0.0/0) to the internet gateway
+
+aws ec2 create-route --route-table-id rtb-id --destination-cidr-block 0.0.0.0/0 --gateway-id igw-id
+
+#Accociate route tables to subnets
+
+aws ec2 associate-route-table --subnet-id subnet-id --route-table-id route-table-id
+
+aws ec2 associate-route-table --subnet-id subnet-id --route-table-id rtb-id
+
+#Create Security Group and Rules
+
+aws ec2 create-security-group --group-name sg-name --description "My security group" --vpc-id vpc-id
+
+aws ec2 authorize-security-group-ingress --group-id sg-id --protocol tcp --port 22 --cidr 0.0.0.0/0
+
+aws ec2 authorize-security-group-ingress --group-id sg-id --protocol tcp --port 80 --cidr 0.0.0.0/0
+
+#Create EC2 with Webserver
+
+aws ec2 run-instances --image-id ami-id --count 1 --instance-type t2.micro --key-name vockey --security-group-ids sg-id --subnet-id subnet-id
+
+
